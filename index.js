@@ -7,7 +7,7 @@ const Web3 = require('web3');
 const http = require('http');
 
 // contract ABI
-const ABI = JSON.parse(fs.readFileSync("abi.json").toString());
+const ABI = require("./abi");
 
 // image sizes
 const fullSize = 10;
@@ -189,7 +189,7 @@ function loadRemainingCatCount(){
 
 function requestHandler(request, response) {
     var path = request.url.split("/").filter((x)=>{return x})
-    var catImage = getCatImage(url[0]);
+    var catImage = getCatImage(path[0]);
     if(path[0] == "remaining"){ // respond with remainingCats
 	response.setHeader('Access-Control-Allow-Origin', '*');
 	response.setHeader('Content-Type', 'application/json');
