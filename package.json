@@ -1,6 +1,6 @@
 {
     "name": "mooncatsinfo",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "MoonCat aggregation server for MoonCatRescue",
     "main": "index.js",
     "scripts": {

@@ -15,7 +15,7 @@ const thumbSize = 2;
 
 const port = process.env.MOONCATRESCUE_PORT || 3000;
 const contractAddress = process.env.MOONCATRESCUE_CONTRACT || "0x60cd862c9c687a9de49aecdc3a99b74a4fc54ab6";
-const providerURL = process.env.MOONCATRESCUE_RPC || "http://127.0.0.1:3000";
+const providerURL = process.env.MOONCATRESCUE_RPC || "http://localhost:8545";
 const refreshDelay = 20 * 1000;
 
 if(!contractAddress) throw "Contract Address not found. Set MOONCATRESCUE_CONTRACT to the address of the contract."
