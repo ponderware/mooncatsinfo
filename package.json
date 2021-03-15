@@ -1,26 +1,26 @@
 {
-    "name": "mooncatsinfo",
-    "version": "1.0.2",
-    "description": "MoonCat aggregation server for MoonCatRescue",
-    "main": "index.js",
-    "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "ponderware ltd.",
-    "license": "See license in license.txt",
-    "dependencies": {
-	"async": "^2.5.0",
-	"canvas": "2.0.0-alpha.2",
-	"progress": "^2.0.0",
-	"web3": "0.20.0",
-	"mooncatparser": "1.0.0"
-    },
-    "bin": {
-	"mooncatsinfo": "./bin/global-index.js"
-    },
-    "preferGlobal": true,
-    "repository" :{
-	"type" : "git",
-	"url" : "https://github.com/ponderware/mooncatsinfo.git"
-    }
+   "name": "@ponderware/mooncatsinfo",
+   "version": "3.2.0",
+   "description": "MoonCat aggregation server for MoonCatRescue",
+   "main": "index.js",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "author": "ponderware ltd.",
+   "license": "See license in license.txt",
+   "dependencies": {
+      "async": "^2.5.0",
+      "canvas": "2.7.0",
+      "mooncatparser": "1.0.0",
+      "progress": "^2.0.0",
+      "web3": "^1.3.4"
+   },
+   "bin": {
+      "mooncatsinfo": "./bin/global-index.js"
+   },
+   "preferGlobal": true,
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/ponderware/mooncatsinfo.git"
+   }
 }

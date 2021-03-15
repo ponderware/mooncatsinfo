@@ -16,18 +16,17 @@ const thumbSize = 2;
 const port = process.env.MOONCATRESCUE_PORT || 3000;
 const contractAddress = process.env.MOONCATRESCUE_CONTRACT || "0x60cd862c9c687a9de49aecdc3a99b74a4fc54ab6";
 const providerURL = process.env.MOONCATRESCUE_RPC || "http://localhost:8545";
-const refreshDelay = 20 * 1000;
+const refreshDelay = 30 * 1000;
 
 if(!contractAddress) throw "Contract Address not found. Set MOONCATRESCUE_CONTRACT to the address of the contract."
 
 if(!providerURL) throw "Contract Address not found. Set MOONCATRESCUE_RPC to the url of the rpc provider.";
 
 var web3 = new Web3()
-web3.setProvider(new Web3.providers.HttpProvider(providerURL));
+web3.setProvider(new Web3.providers.HttpProvider(providerURL), {timeout: 20000});
 
 function loadMoonCatRescueContract(address){
-    var contract = web3.eth.contract(ABI);
-    return contract.at(address);
+    return new web3.eth.Contract(ABI, address);
 }
 
 const mcrContract = loadMoonCatRescueContract(contractAddress);
@@ -58,8 +57,8 @@ function drawCat(catId){
     }
 
     var data = generateMoonCat(catId);
-    var canvasFull = new Canvas(fullSize * data.length, fullSize * data[0].length);
-    var canvasThumb = new Canvas(thumbSize * data.length, thumbSize * data[0].length);
+    var canvasFull = Canvas.createCanvas(fullSize * data.length, fullSize * data[0].length);
+    var canvasThumb = Canvas.createCanvas(thumbSize * data.length, thumbSize * data[0].length);
 
     var ctxFull = canvasFull.getContext('2d');
     var ctxThumb = canvasThumb.getContext('2d');
@@ -81,6 +80,7 @@ function drawCat(catId){
     imageCache[catId] = result;
 
     return result;
+
 }
 
 function getCatImage(catId){
@@ -105,7 +105,13 @@ function handleCatData(err, data){
     }, refreshDelay);
 }
 
-
+function getName (hex){
+    try {
+	return web3.utils.hexToUtf8(hex).trim();
+    } catch (e){
+	return "?";
+    }
+}
 function loadCatData (cb){
     var bar = {
 	start: Date.now(),
@@ -134,37 +140,38 @@ function loadCatData (cb){
 
     async.parallel([
 	function(cb){
-	    mcrContract.getCatIds(tick(cb));
+	    mcrContract.methods.getCatIds().call(tick(cb));
 	},
 	function(cb){
-	    mcrContract.getCatNames(tick(cb));
+	    mcrContract.methods.getCatNames().call(tick(cb));
 	},
 	function(cb){
-	    mcrContract.getCatOwners(tick(cb));
+	    mcrContract.methods.getCatOwners().call(tick(cb));
 	},
 	function(cb){
-	    mcrContract.getCatOfferPrices(tick(cb));
+	    mcrContract.methods.getCatOfferPrices().call(tick(cb));
 	},
 	function(cb){
-	    mcrContract.getCatRequestPrices(tick(cb));
+	    mcrContract.methods.getCatRequestPrices().call(tick(cb));
 	}], function (err, results){
 	    if(err) return cb(err);
 	    var assembled = {};
 	    for(var i = 0; i < results[0].length; i++){
 		var offerPriceWei = results[3][i];
 		var requestPriceWei = results[4][i];
-		var offerPrice = parseFloat(web3.fromWei(offerPriceWei, "ether"), 10);
-		var requestPrice = parseFloat(web3.fromWei(requestPriceWei, "ether"), 10);
+		var offerPrice = parseFloat(web3.utils.fromWei(offerPriceWei, "ether"), 10);
+		var requestPrice = parseFloat(web3.utils.fromWei(requestPriceWei, "ether"), 10);
 		var catId = results[0][i];
 		var cat = {number: i,
 			   id: catId,
-			   name: web3.toUtf8(results[1][i]),
+			   name: getName(results[1][i]),//web3.utils.hexToUtf8(results[1][i]),
 			   owner: results[2][i],
-			   offered: !(offerPriceWei.eq(0)),
+			   offered: (offerPrice != 0), //!(offerPriceWei.eq(0)),
 			   offerPrice: offerPrice,
-			   requested: !(requestPriceWei.eq(0)),
+			   requested: (requestPrice != 0),//!(requestPriceWei.eq(0)),
 			   requestPrice: requestPrice,
-			   thumb: drawCat(catId).thumb}
+			   thumb: drawCat(catId).thumb
+			  }
 		assembled[catId] = cat;
 	    }
 	    var result = results[0].map(function(id){return assembled[id]});
@@ -175,7 +182,7 @@ function loadCatData (cb){
 }
 
 function loadRemainingCatCount(){
-    mcrContract.remainingCats(function(err, result){
+    mcrContract.methods.remainingCats().call(function(err, result){
 	if(result){
 	    console.log("remaining cats:", result.toString());
 	    remainingCats = result.toString();
